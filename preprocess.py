@@ -63,7 +63,7 @@ def train_val_test_split(background: pd.DataFrame, signal: pd.DataFrame, sample_
     return train, val, test
 
 
-def normalize(data: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
+def normalize(data: pd.DataFrame, scaler: StandardScaler, is_train: bool = False) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Normalize the data to have zero mean and unit variance. Also normalize the weights."""
 
     # Separate the data into features, labels and weights
@@ -79,8 +79,9 @@ def normalize(data: pd.DataFrame) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
     w[y == BKG] = w[y == BKG] / np.sum(w[y == BKG]) * len(w) / 2
     w[y == SIG] = w[y == SIG] / np.sum(w[y == SIG]) * len(w) / 2
 
-    # Normalize the features
-    scaler = StandardScaler()
-    x = scaler.fit_transform(x)
+    if is_train:
+        x = scaler.fit_transform(x)
+    else:
+        x = scaler.transform(x)
 
     return x, y, w
